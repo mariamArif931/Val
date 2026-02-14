@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Valentine?</title>
+  <style>
+    :root {
+      --lav-1: #f3eaff;
+      --lav-2: #e6d6ff;
+      --lav-3: #cbb0ff;
+      --deep:  #3a176b;
+      --deep-2:#2a0f52;
+      --card:  rgba(255,255,255,0.78);
+      --shadow: 0 18px 45px rgba(58, 23, 107, 0.22);
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: ui-rounded, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--deep);
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(255,255,255,0.92), transparent 35%),
+        radial-gradient(circle at 82% 25%, rgba(255,255,255,0.88), transparent 42%),
+        radial-gradient(circle at 30% 88%, rgba(255,255,255,0.84), transparent 46%),
+        linear-gradient(135deg, var(--lav-1), var(--lav-2), var(--lav-3));
+    }
+
+    /* Floating heart wallpaper (more + darker) */
+    .hearts-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.42;
+      filter: drop-shadow(0 6px 10px rgba(42, 15, 82, 0.18));
+    }
+
+    .heart {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      transform: rotate(45deg);
+      background: rgba(42, 15, 82, 0.62); /* dark purple */
+      border-radius: 3px;
+      animation: floatUp linear infinite;
+    }
+    .heart::before,
+    .heart::after {
+      content: "";
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: inherit;
+      border-radius: 50%;
+    }
+    .heart::before { left: -6px; top: 0; }
+    .heart::after { left: 0; top: -6px; }
+
+    @keyframes floatUp {
+      from { transform: translateY(0) rotate(45deg); opacity: 0; }
+      10% { opacity: 0.9; }
+      to { transform: translateY(-120vh) rotate(45deg); opacity: 0; }
+    }
+
+    /* Main card */
+    .wrap {
+      position: relative;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: min(720px, 92vw);
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(58, 23, 107, 0.22);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      padding: 28px 26px 24px;
+      position: relative;
+    }
+
+    .sparkle {
+      position: absolute;
+      inset: -2px;
+      border-radius: 26px;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.62), transparent 25%),
+        radial-gradient(circle at 85% 15%, rgba(255,255,255,0.58), transparent 28%),
+        radial-gradient(circle at 40% 90%, rgba(255,255,255,0.52), transparent 30%);
+      mix-blend-mode: overlay;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 4.6vw, 44px);
+      letter-spacing: 0.2px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(203, 176, 255, 0.22);
+      border: 1px dashed rgba(58, 23, 107, 0.35);
+      font-size: 14px;
+      margin: 0 auto 20px;
+      width: fit-content;
+    }
+
+    .badge b { font-weight: 800; }
+
+    .buttons-area {
+      position: relative;
+      display: grid;
+      place-items: center;
+      gap: 14px;
+      padding: 10px 0 4px;
+      min-height: 150px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 16px;
+      font-size: 18px;
+      padding: 14px 22px;
+      transition: transform 120ms ease, filter 120ms ease;
+      box-shadow: 0 10px 22px rgba(42, 15, 82, 0.14);
+      user-select: none;
+    }
+    button:active { transform: scale(0.98); }
+
+    #yes {
+      background: linear-gradient(135deg, var(--deep), #6a3bb6);
+      color: white;
+      font-weight: 800;
+    }
+    #yes:hover { filter: brightness(1.03); transform: translateY(-1px); }
+
+    #no {
+      background: rgba(255,255,255,0.92);
+      color: var(--deep);
+      border: 2px solid rgba(58, 23, 107, 0.35);
+      position: absolute;
+    }
+    #no:hover { transform: translateY(-1px); }
+
+    .msg {
+      text-align: center;
+      min-height: 30px;
+      font-weight: 800;
+      opacity: 0.96;
+      padding: 0 6px;
+    }
+
+    .tiny {
+      text-align: center;
+      font-size: 12px;
+      opacity: 0.72;
+      margin-top: 10px;
+    }
+
+    /* Heart shower canvas */
+    canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    /* Love message overlay */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(243, 234, 255, 0.62);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 280ms ease;
+    }
+    .overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .love-card {
+      width: min(720px, 92vw);
+      background: rgba(255,255,255,0.86);
+      border: 2px solid rgba(58, 23, 107, 0.22);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      padding: 26px;
+      text-align: center;
+    }
+    .love-card h2 {
+      margin: 0 0 12px;
+      font-size: clamp(22px, 3.6vw, 34px);
+      color: var(--deep-2);
+    }
+    .love-card p {
+      margin: 0;
+      font-size: clamp(14px, 2.2vw, 18px);
+      opacity: 0.98;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+
+    .overlay-actions {
+      margin-top: 14px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    #missingBtn {
+      background: rgba(58, 23, 107, 0.10);
+      border: 2px solid rgba(58, 23, 107, 0.28);
+      color: var(--deep-2);
+      font-weight: 800;
+      padding: 12px 14px;
+      font-size: 14px;
+      border-radius: 14px;
+      box-shadow: none;
+    }
+    #missingBtn:hover {
+      filter: brightness(1.02);
+      transform: translateY(-1px);
+    }
+
+    .hint {
+      margin-top: 12px;
+      opacity: 0.72;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="hearts-bg" id="heartsBg" aria-hidden="true"></div>
+  <canvas id="shower"></canvas>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="sparkle" aria-hidden="true"></div>
+
+      <h1>Ahmed, will you be my Valentine?</h1>
+
+      <div class="badge"><b>Important:</b> choose wisely (the hearts are watching)</div>
+
+      <div class="buttons-area" id="arena">
+        <div class="msg" id="msg">Click a button… if you can</div>
+        <div class="btn-row">
+          <button id="yes">YES</button>
+        </div>
+        <button id="no" type="button">NO 🙃</button>
+      </div>
+
+      <div class="tiny">Tip: “NO” will stop running away after 20 seconds </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-label="Love message">
+    <div class="love-card">
+      <h2>Dearest Ahmed</h2>
+      <p id="yesText"></p>
+
+      <div class="overlay-actions">
+        <button id="missingBtn" type="button">this is what is missing from this message</button>
+      </div>
+
+      <div class="hint">(Tap anywhere outside the button to close)</div>
+    </div>
+  </div>
+
+  <script>
+    // ======== Floating heart wallpaper ========
+    const bg = document.getElementById("heartsBg");
+    const heartCount = 26; // increased
+
+    function rand(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function makeBgHearts() {
+      for (let i = 0; i < heartCount; i++) {
+        const h = document.createElement("div");
+        h.className = "heart";
+        const size = rand(8, 14);
+        h.style.width = size + "px";
+        h.style.height = size + "px";
+        h.style.left = rand(0, 100) + "vw";
+        h.style.top = rand(35, 135) + "vh";
+
+        // Make more of them dark purple (as requested)
+        const pick = Math.random();
+        if (pick < 0.72) {
+          h.style.background = "rgba(42, 15, 82, 0.72)"; // dark
+          h.style.opacity = rand(0.26, 0.62);
+        } else if (pick < 0.9) {
+          h.style.background = "rgba(58, 23, 107, 0.55)";
+          h.style.opacity = rand(0.20, 0.52);
+        } else {
+          h.style.background = "rgba(203, 176, 255, 0.60)";
+          h.style.opacity = rand(0.16, 0.40);
+        }
+
+        h.style.animationDuration = rand(7.0, 14.5) + "s";
+        h.style.animationDelay = rand(0, 7) + "s";
+        bg.appendChild(h);
+      }
+    }
+    makeBgHearts();
+
+    // ======== Buttons logic ========
+    const noBtn = document.getElementById("no");
+    const yesBtn = document.getElementById("yes");
+    const msg = document.getElementById("msg");
+    const arena = document.getElementById("arena");
+    const overlay = document.getElementById("overlay");
+    const yesText = document.getElementById("yesText");
+    const missingBtn = document.getElementById("missingBtn");
+
+    // NO click messages (after last one, keep showing it forever)
+    const noMessages = [
+      "noooo why would you do that 🥺",
+      "Nice talking to you, please dont say no",
+      "You know teesri Baar kya hota hai",
+      "It would \"mean a lot\" if you won't do that XD",
+      "Mujhe dramay mai pasand, so please press YES.",
+      "IDC, you are still my valentine :P"
+    ];
+    let noClicks = 0;
+
+    let dodgingEnabled = true;
+    let daredShown = false;
+
+    function placeNoButton(x, y) {
+      const rect = arena.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+
+      const padding = 12;
+      const maxX = rect.width - btnRect.width - padding;
+      const maxY = rect.height - btnRect.height - padding;
+
+      const clampedX = Math.max(padding, Math.min(x, maxX));
+      const clampedY = Math.max(padding + 50, Math.min(y, maxY));
+
+      noBtn.style.left = clampedX + "px";
+      noBtn.style.top = clampedY + "px";
+    }
+
+    (function initNoPos() {
+      const rect = arena.getBoundingClientRect();
+      placeNoButton(rect.width * 0.62, rect.height * 0.66);
+    })();
+
+    function dodge() {
+      if (!dodgingEnabled) return;
+      const rect = arena.getBoundingClientRect();
+      placeNoButton(rand(0, rect.width), rand(0, rect.height));
+    }
+
+    // Dodge only for first 20 seconds
+    noBtn.addEventListener("mouseenter", dodge);
+    noBtn.addEventListener("mousemove", (e) => {
+      if (!dodgingEnabled) return;
+      const r = noBtn.getBoundingClientRect();
+      const dx = (e.clientX - (r.left + r.width/2));
+      const dy = (e.clientY - (r.top + r.height/2));
+      if (Math.hypot(dx, dy) < 40) dodge();
+    });
+
+    setTimeout(() => {
+      dodgingEnabled = false;
+      if (!daredShown) {
+        msg.textContent = "dare to press no";
+        daredShown = true;
+      }
+    }, 20000);
+
+    noBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const idx = Math.min(noClicks, noMessages.length - 1);
+      msg.textContent = noMessages[idx];
+      if (noClicks < noMessages.length - 1) noClicks++;
+      if (dodgingEnabled) dodge();
+    });
+
+    // ======== Red heart shower animation on YES ========
+    const canvas = document.getElementById("shower");
+    const ctx = canvas.getContext("2d");
+
+    function resize() {
+      canvas.width = window.innerWidth * devicePixelRatio;
+      canvas.height = window.innerHeight * devicePixelRatio;
+      canvas.style.width = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
+      ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    const particles = [];
+    function spawnHeart(x, y) {
+      particles.push({
+        x, y,
+        vx: rand(-1.8, 1.8),
+        vy: rand(-6.2, -3.0),
+        g: rand(0.07, 0.14),
+        size: rand(10, 22),
+        rot: rand(0, Math.PI),
+        vr: rand(-0.08, 0.08),
+        life: rand(60, 110)
+      });
+    }
+
+    function drawHeart(x, y, size, rot, alpha) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rot);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = "rgba(255, 0, 60, " + alpha + ")";
+      ctx.beginPath();
+      const s = size / 2;
+      ctx.moveTo(0, s);
+      ctx.bezierCurveTo(0, s - s*1.2, -s*1.4, s - s*1.2, -s*1.4, 0);
+      ctx.bezierCurveTo(-s*1.4, -s*1.2, 0, -s*1.2, 0, -s*0.2);
+      ctx.bezierCurveTo(0, -s*1.2, s*1.4, -s*1.2, s*1.4, 0);
+      ctx.bezierCurveTo(s*1.4, s - s*1.2, 0, s - s*1.2, 0, s);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    let running = false;
+    function loop() {
+      if (!running) return;
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.vy += p.g;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vr;
+        p.life -= 1;
+
+        const alpha = Math.max(0, Math.min(1, p.life / 80));
+        drawHeart(p.x, p.y, p.size, p.rot, alpha);
+
+        if (p.life <= 0 || p.y > window.innerHeight + 50) {
+          particles.splice(i, 1);
+        }
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    function startShower() {
+      running = true;
+      const bursts = 28;
+      let t = 0;
+
+      const interval = setInterval(() => {
+        for (let i = 0; i < bursts; i++) {
+          const baseX = window.innerWidth/2 + rand(-120, 120);
+          const baseY = window.innerHeight - rand(10, 40);
+          spawnHeart(baseX, baseY);
+          if (Math.random() < 0.25) spawnHeart(rand(0, window.innerWidth), window.innerHeight - rand(0, 20));
+        }
+        t++;
+        if (t > 16) clearInterval(interval);
+      }, 90);
+
+      loop();
+
+      setTimeout(() => {
+        running = false;
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      }, 5200);
+    }
+
+    yesBtn.addEventListener("click", () => {
+      msg.textContent = "You chose YES";
+      yesText.textContent = `Always so grateful and happy for your presence in my life, may Allah keep us blessed and eternally happy, ameen 🥺.To a lifetime together, InshaAllah 💜!
+
+Happy Valentine's day!`;
+      overlay.classList.add("show");
+      startShower();
+    });
+
+    // Missing button behavior (don't close overlay when clicking it)
+    let missingShown = false;
+    missingBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!missingShown) {
+        yesText.textContent = yesText.textContent + "\n\n" + `A legend once said~ "I want to say something hmm but neend aarahi hai baad main kahon ga. I think I am getting sleep drunk" 😂`;
+        missingBtn.textContent = "ok now you know";
+        missingShown = true;
+      }
+    });
+
+    // Close overlay by clicking outside the button/card area
+    overlay.addEventListener("click", (e) => {
+      // only close if they clicked the dim background (not the card)
+      if (e.target === overlay) {
+        overlay.classList.remove("show");
+      }
+    });
+  </script>
+</body>
+</html>
